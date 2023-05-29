@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  chatBoxes: [],
+  chatboxes: [],
   chatHistory: {},
 };
 
@@ -9,14 +9,42 @@ export const messengerSlice = createSlice({
   name: "messenger",
   initialState,
   reducers: {
-    addChatBoxes: (state, action) => {
+    addChatbox: (state, action) => {
       if (
-        !state.chatBoxes.find(
+        !state.chatboxes.find(
           (chatbox) => chatbox.socketId === action.payload.socketId
         )
       ) {
-        state.chatBoxes.push(action.payload);
+        state.chatboxes.push(action.payload);
+      }
+    },
+    removeChatbox: (state, action) => {
+      console.log(action.payload);
+      state.chatboxes = state.chatboxes.filter(
+        (chatbox) => chatbox.socketId !== action.payload
+      );
+    },
+    addChatMessage: (state, action) => {
+      if (state.chatHistory[action.payload.socketId]) {
+        //If already exists object with the message with that user- append the message
+        state.chatHistory[action.payload.socketId].push({
+          content: action.payload.content,
+          myMessage: action.payload.myMessage,
+          id: action.payload.id,
+        });
+      } else {
+        state.chatHistory[action.payload.socketId] = [
+          {
+            content: action.payload.content,
+            myMessage: action.payload.myMessage,
+            id: action.payload.id,
+          },
+        ];
       }
     },
   },
 });
+
+export const { addChatbox, removeChatbox, addChatMessage } =
+  messengerSlice.actions;
+export default messengerSlice.reducer;

@@ -34,6 +34,8 @@ io.on("connection", (socket) => {
     loginEventHandler(socket, data);
   });
 
+  socket.on("chat-message", (data) => chatMessageHandler(socket, data));
+
   //We can add event listener on socket to listen when a connected user disconnect.
   socket.on("disconnect", () => {
     disconnectEventHandler(socket.id);
@@ -52,6 +54,19 @@ const disconnectEventHandler = (id) => {
   console.log(`User disconnected of the id: ${id}`);
   removeOnlineUser(id);
   broadCastDisconnectedUserDetails(id);
+};
+
+const chatMessageHandler = (socket, data) => {
+  console.log("message recieved");
+  console.log("sending message to the other user.");
+  const { recieverSocketId, content, id } = data;
+  if (onlineUsers[recieverSocketId]) {
+    io.to(recieverSocketId).emit("chat-message", {
+      senderSocketId: socket.id,
+      content,
+      id,
+    });
+  }
 };
 
 const removeOnlineUser = (id) => {

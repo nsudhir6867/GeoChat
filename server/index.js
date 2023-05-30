@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
 
 //List of all the online users, we will add users in this object from loginEventHandler function.
 let onlineUsers = {};
+let videoRooms = {};
 
 io.on("connection", (socket) => {
   console.log(`user connected of the id: ${socket.id}`);
@@ -35,6 +36,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chat-message", (data) => chatMessageHandler(socket, data));
+
+  socket.on("video-room-create", (data) => {
+    createVideoRoomHandler(socket, data);
+  });
 
   //We can add event listener on socket to listen when a connected user disconnect.
   socket.on("disconnect", () => {
@@ -69,6 +74,25 @@ const chatMessageHandler = (socket, data) => {
   }
 };
 
+const createVideoRoomHandler = (socket, data) => {
+  console.log("new room", data);
+  const { peerId, newRoomId } = data;
+  //Adding new room
+  videoRooms[newRoomId] = {
+    participants: [
+      //This participant is the creator of the video room
+      {
+        socketId: socket.id,
+        username: onlineUsers[socket.id].username,
+        peerId: peerId, //When a user joins the room later, he should know which user he should connect, that's why we use peer id
+      },
+    ],
+  };
+
+  //Now we have to inform all the other users that new room has been created.
+  broadcastVideoRooms();
+};
+
 const removeOnlineUser = (id) => {
   if (onlineUsers[id]) {
     delete onlineUsers[id];
@@ -79,6 +103,11 @@ const removeOnlineUser = (id) => {
 //Function to let the client know about the disconnected user.
 const broadCastDisconnectedUserDetails = (disconnedSocketId) => {
   io.to("logged-users").emit("user-disconnected", disconnedSocketId);
+};
+
+//Function to broadcast to the other users that room has been created.
+const broadcastVideoRooms = () => {
+  io.emit("video-rooms", videoRooms);
 };
 
 //We invoke this function when a user connects to server.

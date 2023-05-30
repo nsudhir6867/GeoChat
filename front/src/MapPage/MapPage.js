@@ -5,6 +5,7 @@ import "./MapPage.css";
 import Marker from "./Marker";
 import UserInfoCard from "./UserInfoCard/UserInfoCard";
 import Messenger from "../Messenger/Mesenger";
+import VideoRooms from "../VideoRooms/VideoRooms";
 
 const MapPage = () => {
   const myLocation = useSelector((state) => state.map.myLocation);
@@ -51,6 +52,7 @@ const MapPage = () => {
           userLocation={cardChosenOption.coords}
         />
       )}
+      <VideoRooms />
     </div>
   );
 };

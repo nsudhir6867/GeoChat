@@ -10,6 +10,7 @@ import LoginButton from "./LoginButton";
 import LoginInput from "./LoginInput";
 import Logo from "./Logo";
 import { proceedWithLogin } from "../store/actions/loginPageActions";
+import { connectWithPeerServer } from "../realtimeCommunication/webRTCHandler";
 
 //Helper function for the LoginPage
 const isUsernameValid = (username) => {
@@ -76,6 +77,7 @@ const LoginPage = () => {
   useEffect(() => {
     if (myLocation) {
       conncectWithSocketIOServer();
+      connectWithPeerServer();
     }
   }, [myLocation]);
 

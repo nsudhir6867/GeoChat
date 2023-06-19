@@ -3,8 +3,9 @@ const cors = require("cors");
 //Express app is created here
 const app = express();
 const http = require("http");
-
 const { Server } = require("socket.io");
+
+const { PeerServer } = require("peer");
 
 //Create server using http module and express app.
 const server = http.createServer(app);
@@ -41,11 +42,18 @@ io.on("connection", (socket) => {
     createVideoRoomHandler(socket, data);
   });
 
+  socket.on("video-room-join", (data) => {
+    videoRoomJoinHandler(socket, data);
+  });
+
   //We can add event listener on socket to listen when a connected user disconnect.
   socket.on("disconnect", () => {
     disconnectEventHandler(socket.id);
   });
 });
+
+//PeerJs server
+const peerServer = PeerServer({ port: 9000, path: "/peer" });
 
 const PORT = process.env.PORT || 3003;
 
@@ -54,6 +62,27 @@ server.listen(PORT, () => {
 });
 
 //Socket events
+
+//We invoke this function when a user connects to server.
+const loginEventHandler = (socket, data) => {
+  //Every user who logins to our application, will emit user-login event with username and coordinates, can join
+  // the socket io room(logged-users);
+  //User will automatically leave the logged-users room once he disconnects
+  socket.join("logged-users");
+  onlineUsers[socket.id] = {
+    username: data.username,
+    coords: data.coords,
+  };
+  console.log(onlineUsers);
+  //here we will emit an event to all the user that has joined the logged-users room.
+  // we will be listening for the online-users on client side.
+  io.to("logged-users").emit(
+    "online-users",
+    convertOnlineUsersToArray(onlineUsers)
+  );
+  broadcastVideoRooms();
+};
+
 //We invoke this funtion when a user disconnects from the server.
 const disconnectEventHandler = (id) => {
   console.log(`User disconnected of the id: ${id}`);
@@ -93,6 +122,26 @@ const createVideoRoomHandler = (socket, data) => {
   broadcastVideoRooms();
 };
 
+const videoRoomJoinHandler = (socket, data) => {
+  const { roomId, peerId } = data;
+  if (videoRooms[roomId]) {
+    videoRooms[roomId].participants.forEach((participant) => {
+      socket.to(participant.socketId).emit("video-room-init", {
+        newParticipantPeerId: peerId,
+      });
+    });
+    videoRooms[roomId].participants = [
+      ...videoRooms[roomId].participants,
+      {
+        socketId: socket.id,
+        username: onlineUsers[socket.id].username,
+        peerId,
+      },
+    ];
+    broadcastVideoRooms();
+  }
+};
+
 const removeOnlineUser = (id) => {
   if (onlineUsers[id]) {
     delete onlineUsers[id];
@@ -107,26 +156,7 @@ const broadCastDisconnectedUserDetails = (disconnedSocketId) => {
 
 //Function to broadcast to the other users that room has been created.
 const broadcastVideoRooms = () => {
-  io.emit("video-rooms", videoRooms);
-};
-
-//We invoke this function when a user connects to server.
-const loginEventHandler = (socket, data) => {
-  //Every user who logins to our application, will emit user-login event with username and coordinates, can join
-  // the socket io room(logged-users);
-  //User will automatically leave the logged-users room once he disconnects
-  socket.join("logged-users");
-  onlineUsers[socket.id] = {
-    username: data.username,
-    coords: data.coords,
-  };
-  console.log(onlineUsers);
-  //here we will emit an event to all the user that has joined the logged-users room.
-  // we will be listening for the online-users on client side.
-  io.to("logged-users").emit(
-    "online-users",
-    convertOnlineUsersToArray(onlineUsers)
-  );
+  io.to("logged-users").emit("video-rooms", videoRooms);
 };
 
 //Helper function to convert obj to array

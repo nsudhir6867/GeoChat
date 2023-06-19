@@ -41,7 +41,8 @@ const convertRoomsToArray = (videoRooms) => {
 };
 
 const RoomList = () => {
-  const rooms = useSelector((store) => store.videoRooms.room);
+  const rooms = useSelector((store) => store.videoRooms.rooms);
+  console.log("Room list", rooms);
   return (
     <div className="map_page_v_rooms_list">
       <CreateRoomButton />

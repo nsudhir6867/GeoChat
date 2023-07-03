@@ -4,29 +4,6 @@ import CreateRoomButton from "./CreateRoomButton";
 import JoinRoomButton from "./JoinRoomButton";
 import ParticipantsVideos from "./ParticipantsVideos";
 
-const DUMMY_ROOMS = [
-  {
-    id: 1,
-    participants: [
-      {
-        socketId: 1,
-        peerId: 1,
-        username: "Martin",
-      },
-    ],
-  },
-  {
-    id: 2,
-    participants: [
-      {
-        socketId: 2,
-        peerId: 2,
-        username: "Batman",
-      },
-    ],
-  },
-];
-
 //Helps function to convert rooms to array
 const convertRoomsToArray = (videoRooms) => {
   const rooms = [];

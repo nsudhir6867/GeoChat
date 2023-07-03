@@ -6,6 +6,7 @@ import {
 import * as socketConn from "../../socketConnection/socketConn";
 import store from "../store";
 import {
+  disconnect,
   getAccessToLocalStream,
   getPeerId,
 } from "../../realtimeCommunication/webRTCHandler";
@@ -40,7 +41,7 @@ export const videoRoomsListHandler = (videoRooms) => {
 };
 
 export const leaveVideoRoom = (roomId) => {
-  //disconnect();
+  disconnect();
   socketConn.leaveVideoRoom({
     roomId,
   });

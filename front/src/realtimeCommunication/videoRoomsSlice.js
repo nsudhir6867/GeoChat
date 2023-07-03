@@ -6,6 +6,8 @@ const initialState = {
   localStream: null,
   //localStream is an object of type media stream, we should store such object in the state redux, but still we are doing it.
   remoteStream: null,
+  isMicOn: true,
+  isCameraOn: true,
 };
 
 export const videoRoomSlice = createSlice({
@@ -25,9 +27,21 @@ export const videoRoomSlice = createSlice({
     setRemoteStream: (state, action) => {
       state.remoteStream = action.payload;
     },
+    setIsMicOn: (state, action) => {
+      state.isMicOn = action.payload;
+    },
+    setIsCameraOn: (state, action) => {
+      state.isCameraOn = action.payload;
+    },
   },
 });
 
-export const { setInRoom, setRooms, setLocalStream, setRemoteStream } =
-  videoRoomSlice.actions;
+export const {
+  setInRoom,
+  setRooms,
+  setLocalStream,
+  setRemoteStream,
+  setIsMicOn,
+  setIsCameraOn,
+} = videoRoomSlice.actions;
 export default videoRoomSlice.reducer;

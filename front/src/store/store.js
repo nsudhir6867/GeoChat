@@ -1,6 +1,6 @@
 //Setting up redux;
 //Do all the imports from redux toolkit
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import mapReducer from "../MapPage/mapSlice";
 import messengerReducer from "../Messenger/MessengerSlice";
 import videoRoomsReducer from "../realtimeCommunication/videoRoomsSlice";

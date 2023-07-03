@@ -3,9 +3,10 @@ import {
   onlineUserHandler,
   userDisconnectedHandler,
 } from "../store/actions/userActions";
-import { chatMessageHandler } from "../store/actions/messengerActions";
+
 import { videoRoomsListHandler } from "../store/actions/videoRoomActions";
-import { call } from "../realtimeCommunication/webRTCHandler";
+import { call, disconnect } from "../realtimeCommunication/webRTCHandler";
+import { chatMessageHandler } from "../store/actions/messengerActions";
 let socket = null;
 
 export const conncectWithSocketIOServer = () => {
@@ -31,6 +32,10 @@ export const conncectWithSocketIOServer = () => {
     call(data);
   });
 
+  socket.on("video-call-disconnect", () => {
+    disconnect();
+  });
+
   socket.on("user-disconnected", (disconnectedUserSocketId) => {
     userDisconnectedHandler(disconnectedUserSocketId);
   });
@@ -54,5 +59,6 @@ export const joinVideoRoom = (data) => {
 };
 
 export const leaveVideoRoom = (data) => {
+  console.log("video-room-leave emiited");
   socket.emit("video-room-leave", data);
 };
